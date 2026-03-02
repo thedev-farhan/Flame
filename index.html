@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLAME GRILL · premium fast food</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ---------- LOADER ---------- */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .loader.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-content {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* flame spark (central ignition) */
+    .flame-spark {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle, #ff4d00 0%, #ffbb00 70%, transparent 90%);
+      border-radius: 50%;
+      filter: blur(8px);
+      animation: flamePulse 1.2s infinite alternate ease-in-out;
+      z-index: 2;
+    }
+
+    @keyframes flamePulse {
+      0% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 30px #ff4d00; }
+      100% { transform: scale(1.6); opacity: 0.5; box-shadow: 0 0 60px #ffaa00; }
+    }
+
+    /* heat wave distortion effect */
+    .heat-wave {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-radial-gradient(circle at 50% 50%, rgba(255, 100, 0, 0.25) 0px, transparent 10px);
+      background-size: 20px 20px;
+      mix-blend-mode: overlay;
+      animation: heatMove 2s infinite alternate;
+      border-radius: 50%;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    @keyframes heatMove {
+      0% { opacity: 0.2; transform: scale(1) skew(0deg); }
+      100% { opacity: 0.6; transform: scale(1.2) skew(1deg, 0.5deg); }
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 2px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.8rem;
+      letter-spacing: 4px;
+      color: white;
+      text-shadow: 0 0 15px #ff4500, 0 0 30px #ffaa00;
+    }
+
+    .letter {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: letterPop 0.4s forwards cubic-bezier(0.5, 1.5, 0.3, 1);
+      display: inline-block;
+      filter: drop-shadow(0 0 6px gold);
+    }
+
+    .letter-space {
+      width: 12px;
+    }
+
+    /* delays for each letter (FLAME GRILL) */
+    .logo-container .letter:nth-child(1) { animation-delay: 0.1s; }
+    .logo-container .letter:nth-child(2) { animation-delay: 0.2s; }
+    .logo-container .letter:nth-child(3) { animation-delay: 0.3s; }
+    .logo-container .letter:nth-child(4) { animation-delay: 0.4s; }
+    .logo-container .letter:nth-child(5) { animation-delay: 0.5s; }
+    .logo-container .letter:nth-child(6) { animation-delay: 0.7s; } /* space treated separately */
+    .logo-container .letter:nth-child(7) { animation-delay: 0.8s; } /* G */
+    .logo-container .letter:nth-child(8) { animation-delay: 0.9s; } /* R */
+    .logo-container .letter:nth-child(9) { animation-delay: 1.0s; } /* I */
+    .logo-container .letter:nth-child(10) { animation-delay: 1.1s; } /* L */
+    .logo-container .letter:nth-child(11) { animation-delay: 1.2s; } /* L */
+
+    @keyframes letterPop {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* circular progress ring */
+    .progress-ring {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 68, 0, 0.2);
+      border-top: 4px solid #ff4500;
+      border-right: 4px solid #ffaa00;
+      border-bottom: 4px solid #ff5500;
+      box-shadow: 0 0 25px #ff5e00, inset 0 0 15px #ff8800;
+      animation: spin 1s linear infinite, glowChange 2.4s infinite alternate;
+      z-index: 5;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes glowChange {
+      0% { border-top-color: #ff4d00; border-right-color: #ff9900; box-shadow: 0 0 25px #ff4d00; }
+      50% { border-top-color: #ff7700; border-right-color: #ffcc00; box-shadow: 0 0 40px #ffaa00; }
+      100% { border-top-color: #ff0000; border-right-color: #ff6600; box-shadow: 0 0 25px #ff2200; }
+    }
+
+    /* ---------- MAIN CONTENT (hidden until loader fades) ---------- */
+    #main-content {
+      display: none;
+      opacity: 0;
+      animation: fadeInContent 1.2s ease forwards;
+    }
+
+    @keyframes fadeInContent {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ---------- HEADER / STICKY NAV ---------- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.2rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+      background: transparent;
+    }
+
+    header.scrolled {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.2rem;
+      background: linear-gradient(45deg, #ff3300, #ffbb00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      position: relative;
+      padding: 0.3rem 0;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #ff3300, #ffbb00);
+      transition: width 0.25s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* floating order button */
+    .floating-order {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(145deg, #ff4500, #ff7700);
+      color: white;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 25px rgba(255, 68, 0, 0.6);
+      border: none;
+      cursor: pointer;
+      z-index: 99;
+      transform: scale(0.9);
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.2s, box-shadow 0.2s;
+      pointer-events: none;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .floating-order.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: all;
+    }
+
+    .floating-order:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 35px #ff3300;
+    }
+
+    /* ---------- HERO SECTION ---------- */
+    .hero {
+      height: 100vh;
+      background: linear-gradient(0deg, rgba(0,0,0,0.8), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1351&q=80') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      padding: 0 8%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(3.5rem, 12vw, 6rem);
+      line-height: 1;
+      background: linear-gradient(135deg, #fff8e7, #ffd966);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px #ff7700;
+      position: relative;
+      display: inline-block;
+    }
+
+    /* light sweep */
+    .hero h1::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
+      transform: skewX(-20deg);
+      animation: lightSweep 6s infinite ease-in-out;
+    }
+
+    @keyframes lightSweep {
+      0% { left: -150%; }
+      20% { left: 50%; }
+      100% { left: 150%; }
+    }
+
+    .subhead {
+      font-size: 1.5rem;
+      margin: 1rem 0 2rem;
+      color: #f0e6d2;
+      text-shadow: 2px 2px 5px black;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2.8rem;
+      border-radius: 60px;
+      font-weight: 700;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-size: 200%;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(145deg, #ff3300, #ff9900, #ffcc00);
+      color: #0a0a0a;
+      box-shadow: 0 8px 20px #ff4400;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #ff9900;
+      color: white;
+      backdrop-filter: blur(5px);
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px #ff8800;
+    }
+
+    /* floating particles */
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #ffbb00;
+      border-radius: 50%;
+      filter: blur(3px);
+      opacity: 0.4;
+      animation: float 6s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-200px) translateX(100px); opacity: 0; }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #ffcc99;
+      font-size: 0.9rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(-15px); }
+      60% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    /* ---------- MENU SECTION (glassmorphism) ---------- */
+    .section {
+      padding: 6rem 8%;
+      background: #0f0f0f;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 4rem;
+      background: linear-gradient(135deg, #ff5500, #ffaa00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 3rem;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+    }
+
+    .menu-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 140, 0, 0.2);
+      border-radius: 30px;
+      padding: 2rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 20px 30px -10px black;
+      text-align: center;
+    }
+
+    .menu-card:hover {
+      transform: scale(1.03) translateY(-10px);
+      box-shadow: 0 25px 40px -5px #ff4400;
+      border-color: #ffaa00;
+    }
+
+    .menu-card img {
+      width: 100%;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #ffaa00;
+    }
+
+    .menu-card h3 {
+      font-size: 2rem;
+      color: #ffbb33;
+    }
+
+    /* ---------- TESTIMONIAL SLIDER (glow effect) ---------- */
+    .testimonial-slider {
+      background: #0a0a0a;
+      padding: 4rem 8%;
+      position: relative;
+    }
+
+    .slider-container {
+      overflow: hidden;
+      width: 100%;
+      margin: 2rem 0;
+    }
+
+    .slider-track {
+      display: flex;
+      transition: transform 0.4s ease;
+      gap: 2rem;
+    }
+
+    .testimonial-card {
+      flex: 0 0 calc(33.333% - 1.35rem);
+      background: rgba(20,20,20,0.8);
+      backdrop-filter: blur(12px);
+      padding: 2rem;
+      border-radius: 30px;
+      border: 1px solid #ff8800;
+      box-shadow: 0 0 35px #ff4400;
+      transition: box-shadow 0.2s;
+    }
+
+    .testimonial-card p {
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+
+    .slider-btn {
+      background: transparent;
+      border: 2px solid #ff8800;
+      color: #ff8800;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 0 0.5rem;
+    }
+
+    .slider-btn:hover {
+      background: #ff8800;
+      color: black;
+    }
+
+    /* ---------- CONTACT SECTION ---------- */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      background: #121212;
+      padding: 4rem;
+      border-radius: 50px;
+    }
+
+    .form-group {
+      margin-bottom: 1.8rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: #222;
+      border: 2px solid #333;
+      border-radius: 60px;
+      font-size: 1rem;
+      color: white;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #ff8800;
+      box-shadow: 0 0 20px #ff8800;
+    }
+
+    textarea {
+      border-radius: 30px;
+    }
+
+    /* fade on scroll */
+    .fade-section {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* responsiveness */
+    @media (max-width: 900px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .testimonial-card { flex: 0 0 calc(100% - 1rem); }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADING SCREEN -->
+  <div class="loader" id="loader">
+    <div class="loader-content">
+      <div class="flame-spark"></div>
+      <div class="heat-wave"></div>
+      <div class="logo-container">
+        <span class="letter">F</span><span class="letter">L</span><span class="letter">A</span><span class="letter">M</span><span class="letter">E</span>
+        <span class="letter-space"></span>
+        <span class="letter">G</span><span class="letter">R</span><span class="letter">I</span><span class="letter">L</span><span class="letter">L</span>
+      </div>
+      <div class="progress-ring"></div>
+    </div>
+  </div>
+
+  <!-- MAIN WEBSITE -->
+  <div id="main-content">
+    <header id="mainHeader">
+      <div class="logo">FLAME GRILL</div>
+      <div class="nav-links">
+        <a href="#hero">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </header>
+
+    <!-- floating order button -->
+    <div class="floating-order" id="floatingOrder"><i class="fas fa-fire" style="margin-right: 8px;"></i>ORDER NOW</div>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <h1>Hot. Fresh. Fast.</h1>
+        <div class="subhead">Flame-grilled perfection, 100% premium ingredients</div>
+        <div class="cta-buttons">
+          <a class="btn btn-primary">Order Now</a>
+          <a class="btn btn-secondary">View Menu</a>
+        </div>
+      </div>
+      <!-- floating particles (heat vibe) -->
+      <div class="particle" style="top: 20%; left: 10%;"></div>
+      <div class="particle" style="top: 60%; left: 70%; animation-delay: 1s;"></div>
+      <div class="particle" style="top: 30%; left: 85%; animation-delay: 2s;"></div>
+      <div class="particle" style="top: 70%; left: 20%; animation-delay: 3s;"></div>
+      <div class="scroll-indicator"><span>scroll</span><i class="fas fa-chevron-down"></i></div>
+    </section>
+
+    <!-- MENU SECTION (glassmorphism cards) -->
+    <section class="section fade-section" id="menu">
+      <h2 class="section-title">signature flames</h2>
+      <div class="menu-grid">
+        <div class="menu-card">
+          <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="burger">
+          <h3>SMOKEY DOUBLE</h3>
+          <p>Char-grilled beef, smoked bacon, flame sauce</p>
+          <span style="color:#ffaa00; font-weight: 700;">$14.90</span>
+        </div>
+        <div class="menu-card">
+          <img src="https://images.unsplash.com/photo-1553979459-d2229c2f9e7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="chicken burger">
+          <h3>BLAZE CHICKEN</h3>
+          <p>Crispy chicken, jalapeño, fiery glaze</p>
+          <span style="color:#ffaa00; font-weight: 700;">$12.50</span>
+        </div>
+        <div class="menu-card">
+          <img src="https://images.unsplash.com/photo-1606755962773-d324e0c130a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="fries">
+          <h3>GOLDEN FLAMES</h3>
+          <p>Truffle fries, parmesan, chili dust</p>
+          <span style="color:#ffaa00; font-weight: 700;">$6.90</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIAL SLIDER -->
+    <section class="testimonial-slider fade-section" id="testimonials">
+      <h2 class="section-title">what the flame says</h2>
+      <div class="slider-container">
+        <div class="slider-track" id="sliderTrack">
+          <div class="testimonial-card"><p>“Best burger in town! The smoky flavor is unreal.”</p><h4>— ALEX R.</h4></div>
+          <div class="testimonial-card"><p>“Fast, fresh, and that sauce… incredible.”</p><h4>— JAMIE L.</h4></div>
+          <div class="testimonial-card"><p>“Flame Grill sets the bar for premium fast food.”</p><h4>— TAYLOR W.</h4></div>
+          <div class="testimonial-card"><p>“I crave their spicy chicken every week!”</p><h4>— SAM K.</h4></div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 2rem;">
+        <button class="slider-btn" id="slidePrev"><i class="fas fa-chevron-left"></i></button>
+        <button class="slider-btn" id="slideNext"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </section>
+
+    <!-- CONTACT + LOCATION -->
+    <section class="section fade-section" id="contact" style="padding-top: 2rem;">
+      <div class="contact-grid">
+        <div>
+          <h2 class="section-title" style="font-size:3rem; margin-bottom:1rem;">visit us</h2>
+          <p style="margin-bottom: 2rem;"><i class="fas fa-map-pin" style="color:#ff8800;"></i> 312 Flame Ave, Foodie District</p>
+          <p><i class="fas fa-phone-alt" style="color:#ff8800;"></i> +1 (800) 555-0199</p>
+          <p><i class="fas fa-clock" style="color:#ff8800;"></i> Mon-Sun 11:00 - 23:00</p>
+        </div>
+        <div>
+          <h2 class="section-title" style="font-size:3rem;">fire message</h2>
+          <form>
+            <div class="form-group"><input type="text" placeholder="Your name"></div>
+            <div class="form-group"><input type="email" placeholder="Email"></div>
+            <div class="form-group"><textarea rows="3" placeholder="Your flame request..."></textarea></div>
+            <button class="btn btn-primary" style="width:100%;">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer style="text-align: center; padding: 2rem; border-top: 1px solid #333;">© 2025 FLAME GRILL · luxury fast food</footer>
+  </div>
+
+  <script>
+    (function() {
+      // Loader fade-out after 2.8s (cinematic)
+      const loader = document.getElementById('loader');
+      const mainContent = document.getElementById('main-content');
+
+      setTimeout(() => {
+        loader.classList.add('fade-out');
+        mainContent.style.display = 'block';
+      }, 2800); // 2.8 sec matches animation
+
+      // Sticky nav & floating button
+      const header = document.getElementById('mainHeader');
+      const floatingBtn = document.getElementById('floatingOrder');
+      
+      function handleScroll() {
+        // header background
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+
+        // floating button appears after hero (approx 600px)
+        if (window.scrollY > 500) {
+          floatingBtn.classList.add('visible');
+        } else {
+          floatingBtn.classList.remove('visible');
+        }
+      }
+      window.addEventListener('scroll', handleScroll);
+      handleScroll(); // initial
+
+      // Simple testimonial slider
+      const track = document.getElementById('sliderTrack');
+      const prevBtn = document.getElementById('slidePrev');
+      const nextBtn = document.getElementById('slideNext');
+      let currentIndex = 0;
+      const cards = document.querySelectorAll('.testimonial-card');
+      const cardWidth = cards[0]?.offsetWidth || 400;
+      const maxIndex = cards.length - 3; // show 3 at once on desktop
+
+      function updateSlider() {
+        if (!track) return;
+        const gap = 32; // 2rem gap
+        const move = -currentIndex * (cardWidth + gap);
+        track.style.transform = `translateX(${move}px)`;
+      }
+
+      nextBtn.addEventListener('click', () => {
+        if (currentIndex < maxIndex) currentIndex++;
+        else currentIndex = 0;
+        updateSlider();
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) currentIndex--;
+        else currentIndex = maxIndex;
+        updateSlider();
+      });
+
+      // reset on resize (rough)
+      window.addEventListener('resize', () => {
+        if (cards[0]) {
+          // recalc index bounds
+          const newWidth = cards[0].offsetWidth;
+          const newMax = cards.length - Math.floor(track.parentElement.offsetWidth / newWidth);
+          if (currentIndex > newMax) currentIndex = newMax;
+          updateSlider();
+        }
+      });
+
+      // IntersectionObserver for fade-in sections
+      const faders = document.querySelectorAll('.fade-section');
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.2 });
+      faders.forEach(section => observer.observe(section));
+
+      // generate extra particles (just for fun)
+      for (let i = 0; i < 8; i++) {
+        let p = document.createElement('div');
+        p.className = 'particle';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 5 + 's';
+        p.style.width = (Math.random() * 10 + 2) + 'px';
+        p.style.height = p.style.width;
+        document.querySelector('.hero').appendChild(p);
+      }
+    })();
+  </script>
+</body>
+</html>
